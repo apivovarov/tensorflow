@@ -64,6 +64,7 @@ CC_PREFIX :=
 # This library is the main target for this makefile. It will contain a minimal
 # runtime that can be linked in to other programs.
 LIB_NAME := libtensorflow-lite.a
+SHARED_LIB_NAME := libtensorflow-lite.so
 
 # Benchmark static library and binary
 BENCHMARK_LIB_NAME := benchmark-lib.a
@@ -153,6 +154,7 @@ BINDIR := $(GENDIR)bin/
 LIBDIR := $(GENDIR)lib/
 
 LIB_PATH := $(LIBDIR)$(LIB_NAME)
+SHARED_LIB_PATH := $(LIBDIR)$(SHARED_LIB_NAME)
 BENCHMARK_LIB := $(LIBDIR)$(BENCHMARK_LIB_NAME)
 BENCHMARK_BINARY := $(BINDIR)$(BENCHMARK_BINARY_NAME)
 MINIMAL_BINARY := $(BINDIR)minimal
@@ -180,7 +182,7 @@ $(OBJDIR)%.o: %.c
 	$(CC) $(CCFLAGS) $(INCLUDES) -c $< -o $@
 
 # The target that's compiled if there's no command-line arguments.
-all: $(LIB_PATH)  $(MINIMAL_BINARY) $(BENCHMARK_BINARY)
+all: $(LIB_PATH) $(SHARED_LIB_PATH) $(MINIMAL_BINARY) $(BENCHMARK_BINARY)
 
 # The target that's compiled for micro-controllers
 micro: $(LIB_PATH)
@@ -193,6 +195,13 @@ tensorflow/lite/schema/schema_generated.h:
 $(LIB_PATH): tensorflow/lite/schema/schema_generated.h $(LIB_OBJS)
 	@mkdir -p $(dir $@)
 	$(AR) $(ARFLAGS) $(LIB_PATH) $(LIB_OBJS)
+
+$(SHARED_LIB_PATH): $(LIB_PATH)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) \
+	-shared -o $(SHARED_LIB_PATH) \
+	-Wl,--whole-archive $(LIB_PATH) -Wl,--no-whole-archive \
+	$(LDFLAGS) $(LIBS)
 
 $(MINIMAL_BINARY): $(MINIMAL_OBJS) $(LIB_PATH)
 	@mkdir -p $(dir $@)
