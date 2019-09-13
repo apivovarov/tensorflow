@@ -20,4 +20,4 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/../../../.."
 
 CC_PREFIX="" \
-make -j$(nproc) -f tensorflow/lite/tools/make/Makefile TARGET=linux
+make -j$(nproc) -f tensorflow/lite/tools/make/Makefile TARGET=linux TARGET_ARCH=ivybridge

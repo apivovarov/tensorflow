@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,11 @@
 # limitations under the License.
 # ==============================================================================
 
+set -x
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/../../../.."
+TENSORFLOW_DIR="${SCRIPT_DIR}/../../../.."
 
-CC_PREFIX="" \
-make -j$(nproc) -f tensorflow/lite/tools/make/Makefile TARGET=linux
+make -j 4 BUILD_WITH_NNAPI=false -C "${TENSORFLOW_DIR}" -f tensorflow/lite/tools/make/Makefile TARGET=linux TARGET_ARCH=ivybridge
+
